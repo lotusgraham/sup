@@ -35,7 +35,8 @@ app.post('/users', jsonParser, function(req, res) {
     }
 
     var user = new User({
-        username: req.body.username
+        username: req.body.username,
+        password: req.body.password
     });
 
     user.save().then(function(user) {
@@ -243,4 +244,3 @@ mongoose.connect(databaseUri).then(function() {
 });
 
 module.exports = app;
-
