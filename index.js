@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 
 var User = require('./models/user');
 var Message = require('./models/message');
+var bcrypt = require('bcrypt');
 
 var app = express();
 
@@ -34,18 +35,32 @@ app.post('/users', jsonParser, function(req, res) {
         });
     }
 
-    var user = new User({
-        username: req.body.username,
-        password: req.body.password
-    });
+    bcrypt.genSalt(10, function(err, salt) {
+        if (err) return res.status(500).json({});
 
-    user.save().then(function(user) {
-        res.location('/users/' + user._id).status(201).json({});
-    }).catch(function(err) {
-        res.status(500).send({
-            message: 'Internal server error'
+        bcrypt.hash(req.body.password, salt, function(err, hash) {
+            if (err) return res.status(500).json({});
+
+            var user = new User({
+                username: req.body.username,
+                password: hash
+            });
+
+            user.save().then(function(user) {
+                res.location('/users/' + user._id).status(201).json({});
+            }).catch(function(err) {
+                res.status(500).send({
+                    message: 'Internal server error'
+                });
+            });
         });
     });
+
+    // var user = new User({
+    //     username: req.body.username,
+    //     password: req.body.password
+    // });
+
 });
 
 app.get('/users/:userId', function(req, res) {
