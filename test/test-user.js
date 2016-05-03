@@ -218,6 +218,12 @@ describe('User endpoints', function() {
                         res.body._id.should.equal(params.userId)
                     });
             });
+            it('should protect user-only pages', function(){
+                var user = {
+                    username: 'joe',
+                    password: 'password'
+                }
+            });
         });
 
         describe('PUT', function() {
