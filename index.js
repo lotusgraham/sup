@@ -5,10 +5,39 @@ var mongoose = require('mongoose');
 var User = require('./models/user');
 var Message = require('./models/message');
 var bcrypt = require('bcrypt');
+var passport = require ('passport');
+var BasicStrategy = require('passport-http').BasicStrategy;
 
 var app = express();
 
 var jsonParser = bodyParser.json();
+
+var strategy = new BasicStrategy(function(username, password, callback) {
+    User.findOne({
+        username: username
+    }, function (err, user) {
+        if (err) return callback(err);
+
+        if (!user) {
+            return callback(null, false, {
+                message: 'Incorrect username.'
+            });
+        }
+
+        user.validatePassword(password, function(err, isValid) {
+            if (err) return callback(err);
+
+            if (!isValid) {
+                return callback(null, false, {
+                    message: 'Incorrect password.'
+                });
+            }
+            return callback(null, user);
+        });
+    });
+});
+passport.use(strategy);
+app.use(passport.initialize());
 
 app.get('/users', function(req, res) {
     User.find({}).then(function(users) {
@@ -78,6 +107,15 @@ app.get('/users/:userId', function(req, res) {
         res.status(500).send({
             message: 'Internal server error'
         });
+    });
+});
+
+// An endpoint for testing access to protected user-only pages
+app.get('/hidden', passport.authenticate('basic', {
+    session: false
+}), function(req, res) {
+    res.json({
+        message: 'You have found the hidden treasure.'
     });
 });
 
