@@ -135,6 +135,34 @@ describe('User endpoints', function() {
                         res.body.message.should.equal('Incorrect field type: username');
                     });
             });
+            it('should check that the password is a hash', function(){
+                var user = {
+                    username: 'joe',
+                    password: 'password'
+                };
+                return chai.request(app)
+                    .post(this.pattern.stringify())
+                    .send(user)
+                    .then(function(res) {
+                        res.should.have.status(201);
+                        res.type.should.equal('application/json');
+                        res.charset.should.equal('utf-8');
+                        res.should.have.header('location');
+                        res.body.should.be.an('object');
+                        res.body.should.be.empty;
+
+                        return chai.request(app)
+                            .get(res.headers.location);
+                    })
+                    .then(function(res) {
+                        res.body.password.should.be.an('object');
+                        res.body.password.should.have.property('password');
+                        res.body.password.should.be.a('string');
+                        res.body.password.should.equal(user.password);
+                        res.body.should.have.property('_id');
+                        res.body._id.should.be.a('string');
+                    });
+            })
         });
     });
 
