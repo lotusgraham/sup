@@ -281,22 +281,27 @@ describe('User endpoints', function() {
         describe.only('PUT', function() {
             it('should allow editing a user', function() {
 
-                var newUser = new User({
+                var user = new User({
                     username: 'joe',
                     password: 'password'
                 });
+                var newUserName = 'Aric';
 
-                var oldUser = new User({
-                    username: 'joe2',
-                    password: 'password2'
-                });
-
-                newUser.save().then(chai.request(app)).then(function(res) {
-                    res.should.have.status(200);
-                    res.type.should.equal('application/json');
-                    res.charset.should.equal('utf-8');
-                    res.body.should.be.an('object');
-                    res.body.should.be.empty;
+                return user.save(function(err){
+                    if (err) {
+                        console.log('error');
+                    }
+                    return chai.request(app)
+                    .put('/users/' +user._id).send(newUserName)
+                   .then(function(res) {
+                       console.log('old: ',user);
+                       res.should.have.status(200);
+                       res.type.should.equal('application/json');
+                       res.charset.should.equal('utf-8');
+                       res.body.should.be.an('string');
+                       res.body.should.be.empty
+                       //TODO: use Mongoose to test that the username has been changed correctly 
+                   });
                 });
             });
             it('should reject users without a username', function() {
