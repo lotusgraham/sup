@@ -76,6 +76,7 @@ app.post('/users', jsonParser, function(req, res) {
             });
 
             user.save().then(function(user) {
+                console.log(hash)
                 res.location('/users/' + user._id).status(201).json({});
             }).catch(function(err) {
                 res.status(500).send({

@@ -8,6 +8,10 @@ var UrlPattern = require('url-pattern');
 var shared = require('./shared');
 var app = require('../index');
 var bcrypt = require('bcrypt');
+var mongoose = require('mongoose');
+var User = require('../models/user');
+var passport = require ('passport');
+var BasicStrategy = require('passport-http').BasicStrategy;
 
 var should = chai.should();
 
@@ -171,7 +175,7 @@ describe('User endpoints', function() {
             this.pattern = new UrlPattern('/users/:userId');
         });
 
-        describe.only('GET', function() {
+        describe('GET', function() {
             it('should 404 on non-existent users', function() {
                 var spy = chai.spy();
                 return chai.request(app)
@@ -274,15 +278,23 @@ describe('User endpoints', function() {
             });
         });
 
-        describe('PUT', function() {
+        describe.only('PUT', function() {
             it('should allow editing a user', function() {
-                var oldUser = {
-                    username: 'joe',
-                    password: 'password'
-                };
-                var newUser = {
-                    username: 'joe2'
-                };
+
+                        var newUser = new User({
+                        username: 'joe',
+                        password: 'password'
+                    });
+
+                    var oldUser = new User({
+                        username: 'joe2',
+                        password: 'password2'
+                    });
+
+                    user.save().then(function(user) {
+                        console.log(user.password);
+                        res.location('/users/' + user._id).status(201).json({});
+                    });
                 var params;
                 return chai.request(app)
                     .post('/users')
