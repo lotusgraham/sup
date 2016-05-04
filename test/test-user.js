@@ -297,8 +297,56 @@ describe('User endpoints', function() {
                     res.charset.should.equal('utf-8');
                     res.body.should.be.an('object');
                     res.body.should.be.empty;
-
-
+                });
+            });
+            it('should reject users without a username', function() {
+                var user = {
+                    _id: '000000000000000000000000'
+                };
+                var spy = chai.spy();
+                return chai.request(app)
+                .put(this.pattern.stringify({
+                    userId: user._id
+                }))
+                .send(user)
+                .then(spy)
+                .then(function() {
+                    spy.should.not.have.been.called();
+                })
+                .catch(function(err) {
+                    var res = err.response;
+                    res.should.have.status(422);
+                    res.type.should.equal('application/json');
+                    res.charset.should.equal('utf-8');
+                    res.body.should.be.an('object');
+                    res.body.should.have.property('message');
+                    res.body.message.should.equal('Missing field: username');
+                });
+            });
+            it('should reject non-string usernames', function() {
+                var user = {
+                    _id: '000000000000000000000000',
+                    username: 42,
+                    password: 'password'
+                };
+                var spy = chai.spy();
+                return chai.request(app)
+                .put(this.pattern.stringify({
+                    userId: user._id
+                }))
+                .send(user)
+                .then(spy)
+                .then(function() {
+                    spy.should.not.have.been.called();
+                })
+                .catch(function(err) {
+                    var res = err.response;
+                    res.should.have.status(422);
+                    res.type.should.equal('application/json');
+                    res.charset.should.equal('utf-8');
+                    res.body.should.be.an('object');
+                    res.body.should.have.property('message');
+                    res.body.message.should.equal('Incorrect field type: username');
                 });
             });
 
