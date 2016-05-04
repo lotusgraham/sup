@@ -4,10 +4,40 @@ var mongoose = require('mongoose');
 
 var User = require('./models/user');
 var Message = require('./models/message');
+var bcrypt = require('bcrypt');
+var passport = require ('passport');
+var BasicStrategy = require('passport-http').BasicStrategy;
 
 var app = express();
 
 var jsonParser = bodyParser.json();
+
+var strategy = new BasicStrategy(function(username, password, callback) {
+    User.findOne({
+        username: username
+    }, function (err, user) {
+        if (err) return callback(err);
+
+        if (!user) {
+            return callback(null, false, {
+                message: 'Incorrect username.'
+            });
+        }
+
+        user.validatePassword(password, function(err, isValid) {
+            if (err) return callback(err);
+
+            if (!isValid) {
+                return callback(null, false, {
+                    message: 'Incorrect password.'
+                });
+            }
+            return callback(null, user);
+        });
+    });
+});
+passport.use(strategy);
+app.use(passport.initialize());
 
 app.get('/users', function(req, res) {
     User.find({}).then(function(users) {
@@ -34,18 +64,32 @@ app.post('/users', jsonParser, function(req, res) {
         });
     }
 
-    var user = new User({
-        username: req.body.username
-    });
+    bcrypt.genSalt(10, function(err, salt) {
+        if (err) return res.status(500).json({});
 
-    user.save().then(function(user) {
-        res.location('/users/' + user._id).status(201).json({});
-    }).catch(function(err) {
-        console.log(err);
-        res.status(500).send({
-            message: 'Internal server error'
+        bcrypt.hash(req.body.password, salt, function(err, hash) {
+            if (err) return res.status(500).json({});
+
+            var user = new User({
+                username: req.body.username,
+                password: hash
+            });
+
+            user.save().then(function(user) {
+                res.location('/users/' + user._id).status(201).json({});
+            }).catch(function(err) {
+                res.status(500).send({
+                    message: 'Internal server error'
+                });
+            });
         });
     });
+
+    // var user = new User({
+    //     username: req.body.username,
+    //     password: req.body.password
+    // });
+
 });
 
 app.get('/users/:userId', function(req, res) {
@@ -60,10 +104,18 @@ app.get('/users/:userId', function(req, res) {
         }
         res.json(user);
     }).catch(function(err) {
-        console.log(err);
         res.status(500).send({
             message: 'Internal server error'
         });
+    });
+});
+
+// An endpoint for testing access to protected user-only pages
+app.get('/hidden', passport.authenticate('basic', {
+    session: false
+}), function(req, res) {
+    res.json({
+        message: 'You have found the hidden treasure.'
     });
 });
 
@@ -89,13 +141,13 @@ app.put('/users/:userId', jsonParser, function(req, res) {
     User.findOneAndUpdate({
         _id: req.params.userId
     }, {
+        _id: req.params.userId,
         username: req.body.username
     }, {
         upsert: true
     }).then(function(user) {
         res.status(200).json({});
     }).catch(function(err) {
-        console.log(err);
         res.status(500).send({
             message: 'Internal server error'
         });
@@ -114,7 +166,6 @@ app.delete('/users/:userId', function(req, res) {
         }
         res.status(200).json({});
     }).catch(function(err) {
-        console.log(err);
         res.status(500).send({
             message: 'Internal server error'
         });
@@ -199,25 +250,18 @@ app.post('/messages', jsonParser, function(req, res) {
             res.status(422).json({
                 message: 'Incorrect field value: from'
             });
-            return null;
         }
         else if (!results[1]) {
             res.status(422).json({
                 message: 'Incorrect field value: to'
             });
-            return null;
         }
         else {
             return message.save()
         }
     }).then(function(user) {
-        if (!user) {
-            // Incorrect field values - handled above.
-            return;
-        }
         res.location('/messages/' + message._id).status(201).json({});
     }).catch(function(err) {
-        console.log(err);
         res.status(500).send({
             message: 'Internal server error'
         });
@@ -239,29 +283,17 @@ app.get('/messages/:messageId', function(req, res) {
         }
         res.json(message);
     }).catch(function(err) {
-        console.log(err);
         res.status(500).send({
             message: 'Internal server error'
         });
     });
 });
 
-var runServer = function(callback) {
-    var databaseUri = global.databaseUri || 'mongodb://localhost/sup';
-    mongoose.connect(databaseUri).then(function() {
-        var server = app.listen(8080, function() {
-            console.log('Listening on localhost:8080');
-            if (callback) {
-                callback(server);
-            }
-        });
+var databaseUri = global.databaseUri || 'mongodb://localhost/sup';
+mongoose.connect(databaseUri).then(function() {
+    app.listen(8080, function() {
+        console.log('Listening on localhost:8080');
     });
-};
+});
 
-if (require.main === module) {
-    runServer();
-};
-
-exports.app = app;
-exports.runServer = runServer;
-
+module.exports = app;

@@ -5,7 +5,8 @@ var chaiHttp = require('chai-http');
 var spies = require('chai-spies');
 var mongoose = require('mongoose');
 var UrlPattern = require('url-pattern');
-var app = require('../index').app;
+var shared = require('./shared');
+var app = require('../index');
 
 var should = chai.should();
 
@@ -13,10 +14,7 @@ chai.use(chaiHttp);
 chai.use(spies);
 
 describe('Message endpoints', function() {
-    var server;
     beforeEach(function() {
-        console.log(app._router.stack.length, 'endpoints');
-        console.log('Drop database');
         mongoose.connection.db.dropDatabase();
         this.alice = {
             username: 'alice',
