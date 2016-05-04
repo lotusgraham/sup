@@ -7,11 +7,13 @@ var mongoose = require('mongoose');
 var UrlPattern = require('url-pattern');
 var shared = require('./shared');
 var app = require('../index');
+var bcrypt = require('bcrypt');
 
 var should = chai.should();
 
 chai.use(chaiHttp);
 chai.use(spies);
+// chai.use(bcrypt);
 
 describe('User endpoints', function() {
     beforeEach(function() {
@@ -169,7 +171,7 @@ describe('User endpoints', function() {
             this.pattern = new UrlPattern('/users/:userId');
         });
 
-        describe('GET', function() {
+        describe.only('GET', function() {
             it('should 404 on non-existent users', function() {
                 var spy = chai.spy();
                 return chai.request(app)
@@ -222,7 +224,18 @@ describe('User endpoints', function() {
                 var user = {
                     username: 'joe',
                     password: 'password'
-                }
+                };
+                return chai.request(app)
+                    .post('/users')
+                    .send(user)
+                    .then(function(res){
+                        return chai.request(app)
+                        .get('/hidden')
+                        .auth(user.username, user.password)
+                        .then(function(res){
+                            res.should.have.status(200);
+                        });
+                    });
             });
         });
 
