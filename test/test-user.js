@@ -187,7 +187,7 @@ describe('User endpoints', function() {
                         res.body.username.should.equal(user.username);
                         res.body.should.have.property('_id');
                         res.body._id.should.be.a('string');
-                        res.body._id.should.equal(params.userId)
+                        res.body._id.should.equal(params.userId);
                     });
             });
         });
@@ -370,7 +370,7 @@ describe('User endpoints', function() {
                                 var res = err.response;
                                 res.should.have.status(404);
                             });
-                    }.bind(this))
+                    }.bind(this));
             });
         });
     });
