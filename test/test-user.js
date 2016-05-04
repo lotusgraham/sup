@@ -231,7 +231,7 @@ describe('User endpoints', function() {
                     .then(function(res){
                         return chai.request(app)
                         .get('/hidden')
-                        .auth(user.username, user.password);
+                        .auth(user.username, user.password)
                         .then(function(res){
                             res.should.have.status(200);
                         });
