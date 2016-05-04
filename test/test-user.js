@@ -31,14 +31,14 @@ describe('User endpoints', function() {
         describe('GET', function() {
             it('should return an empty list of users initially', function() {
                 return chai.request(app)
-                    .get(this.pattern.stringify())
-                    .then(function(res) {
-                        res.should.have.status(200);
-                        res.type.should.equal('application/json');
-                        res.charset.should.equal('utf-8');
-                        res.body.should.be.an('array');
-                        res.body.length.should.equal(0);
-                    });
+                .get(this.pattern.stringify())
+                .then(function(res) {
+                    res.should.have.status(200);
+                    res.type.should.equal('application/json');
+                    res.charset.should.equal('utf-8');
+                    res.body.should.be.an('array');
+                    res.body.length.should.equal(0);
+                });
             });
 
             it('should return a list of users', function() {
@@ -47,25 +47,25 @@ describe('User endpoints', function() {
                     password: 'password'
                 };
                 return chai.request(app)
-                    .post(this.pattern.stringify())
-                    .send(user)
-                    .then(function(res) {
-                        return chai.request(app)
-                            .get(this.pattern.stringify());
-                    }.bind(this))
-                    .then(function(res) {
-                        res.should.have.status(200);
-                        res.type.should.equal('application/json');
-                        res.charset.should.equal('utf-8');
-                        res.body.should.be.an('array');
-                        res.body.length.should.equal(1);
-                        res.body[0].should.be.an('object');
-                        res.body[0].should.have.property('username');
-                        res.body[0].username.should.be.a('string');
-                        res.body[0].username.should.equal(user.username);
-                        res.body[0].should.have.property('_id');
-                        res.body[0]._id.should.be.a('string');
-                    });
+                .post(this.pattern.stringify())
+                .send(user)
+                .then(function(res) {
+                    return chai.request(app)
+                    .get(this.pattern.stringify());
+                }.bind(this))
+                .then(function(res) {
+                    res.should.have.status(200);
+                    res.type.should.equal('application/json');
+                    res.charset.should.equal('utf-8');
+                    res.body.should.be.an('array');
+                    res.body.length.should.equal(1);
+                    res.body[0].should.be.an('object');
+                    res.body[0].should.have.property('username');
+                    res.body[0].username.should.be.a('string');
+                    res.body[0].username.should.equal(user.username);
+                    res.body[0].should.have.property('_id');
+                    res.body[0]._id.should.be.a('string');
+                });
 
             });
         });
@@ -76,47 +76,47 @@ describe('User endpoints', function() {
                     password: 'password'
                 };
                 return chai.request(app)
-                    .post(this.pattern.stringify())
-                    .send(user)
-                    .then(function(res) {
-                        res.should.have.status(201);
-                        res.type.should.equal('application/json');
-                        res.charset.should.equal('utf-8');
-                        res.should.have.header('location');
-                        res.body.should.be.an('object');
-                        res.body.should.be.empty;
+                .post(this.pattern.stringify())
+                .send(user)
+                .then(function(res) {
+                    res.should.have.status(201);
+                    res.type.should.equal('application/json');
+                    res.charset.should.equal('utf-8');
+                    res.should.have.header('location');
+                    res.body.should.be.an('object');
+                    res.body.should.be.empty;
 
-                        return chai.request(app)
-                            .get(res.headers.location);
-                    })
-                    .then(function(res) {
-                        res.body.should.be.an('object');
-                        res.body.should.have.property('username');
-                        res.body.username.should.be.a('string');
-                        res.body.username.should.equal(user.username);
-                        res.body.should.have.property('_id');
-                        res.body._id.should.be.a('string');
-                    });
+                    return chai.request(app)
+                    .get(res.headers.location);
+                })
+                .then(function(res) {
+                    res.body.should.be.an('object');
+                    res.body.should.have.property('username');
+                    res.body.username.should.be.a('string');
+                    res.body.username.should.equal(user.username);
+                    res.body.should.have.property('_id');
+                    res.body._id.should.be.a('string');
+                });
             });
             it('should reject users without a username', function() {
                 var user = {};
                 var spy = chai.spy();
                 return chai.request(app)
-                    .post(this.pattern.stringify())
-                    .send(user)
-                    .then(spy)
-                    .then(function() {
-                        spy.should.not.have.been.called();
-                    })
-                    .catch(function(err) {
-                        var res = err.response;
-                        res.should.have.status(422);
-                        res.type.should.equal('application/json');
-                        res.charset.should.equal('utf-8');
-                        res.body.should.be.an('object');
-                        res.body.should.have.property('message');
-                        res.body.message.should.equal('Missing field: username');
-                    });
+                .post(this.pattern.stringify())
+                .send(user)
+                .then(spy)
+                .then(function() {
+                    spy.should.not.have.been.called();
+                })
+                .catch(function(err) {
+                    var res = err.response;
+                    res.should.have.status(422);
+                    res.type.should.equal('application/json');
+                    res.charset.should.equal('utf-8');
+                    res.body.should.be.an('object');
+                    res.body.should.have.property('message');
+                    res.body.message.should.equal('Missing field: username');
+                });
             });
             it('should reject non-string usernames', function() {
                 var user = {
@@ -125,21 +125,21 @@ describe('User endpoints', function() {
                 };
                 var spy = chai.spy();
                 return chai.request(app)
-                    .post(this.pattern.stringify())
-                    .send(user)
-                    .then(spy)
-                    .then(function() {
-                        spy.should.not.have.been.called();
-                    })
-                    .catch(function(err) {
-                        var res = err.response;
-                        res.should.have.status(422);
-                        res.type.should.equal('application/json');
-                        res.charset.should.equal('utf-8');
-                        res.body.should.be.an('object');
-                        res.body.should.have.property('message');
-                        res.body.message.should.equal('Incorrect field type: username');
-                    });
+                .post(this.pattern.stringify())
+                .send(user)
+                .then(spy)
+                .then(function() {
+                    spy.should.not.have.been.called();
+                })
+                .catch(function(err) {
+                    var res = err.response;
+                    res.should.have.status(422);
+                    res.type.should.equal('application/json');
+                    res.charset.should.equal('utf-8');
+                    res.body.should.be.an('object');
+                    res.body.should.have.property('message');
+                    res.body.message.should.equal('Incorrect field type: username');
+                });
             });
             it('should hash a password', function(){
                 var user = {
@@ -147,25 +147,25 @@ describe('User endpoints', function() {
                     password: 'password'
                 };
                 return chai.request(app)
-                    .post(this.pattern.stringify())
-                    .send(user)
-                    .then(function(res) {
-                        res.should.have.status(201);
-                        res.type.should.equal('application/json');
-                        res.charset.should.equal('utf-8');
-                        res.should.have.header('location');
-                        res.body.should.be.an('object');
-                        res.body.should.be.empty;
+                .post(this.pattern.stringify())
+                .send(user)
+                .then(function(res) {
+                    res.should.have.status(201);
+                    res.type.should.equal('application/json');
+                    res.charset.should.equal('utf-8');
+                    res.should.have.header('location');
+                    res.body.should.be.an('object');
+                    res.body.should.be.empty;
 
-                        return chai.request(app)
-                            .get(res.headers.location);
-                    })
-                    .then(function(res) {
-                        res.body.should.be.an('object');
-                        res.body.should.have.property('password');
-                        res.body.password.should.be.a('string');
-                        res.body.password.should.not.equal(user.password);
-                    });
+                    return chai.request(app)
+                    .get(res.headers.location);
+                })
+                .then(function(res) {
+                    res.body.should.be.an('object');
+                    res.body.should.have.property('password');
+                    res.body.password.should.be.a('string');
+                    res.body.password.should.not.equal(user.password);
+                });
             });
         });
     });
@@ -179,20 +179,20 @@ describe('User endpoints', function() {
             it('should 404 on non-existent users', function() {
                 var spy = chai.spy();
                 return chai.request(app)
-                    .get(this.pattern.stringify({userId: '000000000000000000000000'}))
-                    .then(spy)
-                    .then(function() {
-                        spy.should.not.have.been.called();
-                    })
-                    .catch(function(err) {
-                        var res = err.response;
-                        res.should.have.status(404);
-                        res.type.should.equal('application/json');
-                        res.charset.should.equal('utf-8');
-                        res.body.should.be.an('object');
-                        res.body.should.have.property('message');
-                        res.body.message.should.equal('User not found');
-                    });
+                .get(this.pattern.stringify({userId: '000000000000000000000000'}))
+                .then(spy)
+                .then(function() {
+                    spy.should.not.have.been.called();
+                })
+                .catch(function(err) {
+                    var res = err.response;
+                    res.should.have.status(404);
+                    res.type.should.equal('application/json');
+                    res.charset.should.equal('utf-8');
+                    res.body.should.be.an('object');
+                    res.body.should.have.property('message');
+                    res.body.message.should.equal('User not found');
+                });
             });
 
             it('should return a single user', function() {
@@ -202,27 +202,27 @@ describe('User endpoints', function() {
                 };
                 var params;
                 return chai.request(app)
-                    .post('/users')
-                    .send(user)
-                    .then(function(res) {
-                        params = this.pattern.match(res.headers.location);
-                        return chai.request(app)
-                            .get(this.pattern.stringify({
-                                userId: params.userId
-                            }));
-                    }.bind(this))
-                    .then(function(res) {
-                        res.should.have.status(200);
-                        res.type.should.equal('application/json');
-                        res.charset.should.equal('utf-8');
-                        res.body.should.be.an('object');
-                        res.body.should.have.property('username');
-                        res.body.username.should.be.a('string');
-                        res.body.username.should.equal(user.username);
-                        res.body.should.have.property('_id');
-                        res.body._id.should.be.a('string');
-                        res.body._id.should.equal(params.userId);
-                    });
+                .post('/users')
+                .send(user)
+                .then(function(res) {
+                    params = this.pattern.match(res.headers.location);
+                    return chai.request(app)
+                    .get(this.pattern.stringify({
+                        userId: params.userId
+                    }));
+                }.bind(this))
+                .then(function(res) {
+                    res.should.have.status(200);
+                    res.type.should.equal('application/json');
+                    res.charset.should.equal('utf-8');
+                    res.body.should.be.an('object');
+                    res.body.should.have.property('username');
+                    res.body.username.should.be.a('string');
+                    res.body.username.should.equal(user.username);
+                    res.body.should.have.property('_id');
+                    res.body._id.should.be.a('string');
+                    res.body._id.should.equal(params.userId);
+                });
             });
             it('should allow authenticated users to see hidden pages', function(){
                 var user = {
@@ -230,16 +230,16 @@ describe('User endpoints', function() {
                     password: 'password'
                 };
                 return chai.request(app)
-                    .post('/users')
-                    .send(user)
+                .post('/users')
+                .send(user)
+                .then(function(res){
+                    return chai.request(app)
+                    .get('/hidden')
+                    .auth(user.username, user.password)
                     .then(function(res){
-                        return chai.request(app)
-                            .get('/hidden')
-                            .auth(user.username, user.password)
-                            .then(function(res){
-                                res.should.have.status(200);
-                        });
+                        res.should.have.status(200);
                     });
+                });
             });
             it('should keep unauthenticated users out of hidden pages', function(){
                 var user = {
@@ -247,16 +247,16 @@ describe('User endpoints', function() {
                     password: 'password'
                 };
                 return chai.request(app)
-                    .post('/users')
-                    .send(user)
-                    .then(function(res){
-                        return chai.request(app)
-                            .get('/hidden')
-                            .catch(function(err){
-                                var res = err.response;
-                                res.should.have.status(401);
-                        });
+                .post('/users')
+                .send(user)
+                .then(function(res){
+                    return chai.request(app)
+                    .get('/hidden')
+                    .catch(function(err){
+                        var res = err.response;
+                        res.should.have.status(401);
                     });
+                });
             });
             it('should keep improperly authenticated users out of hidden pages', function(){
                 var user = {
@@ -264,211 +264,106 @@ describe('User endpoints', function() {
                     password: 'password'
                 };
                 return chai.request(app)
-                    .post('/users')
-                    .send(user)
-                    .then(function(res){
-                        return chai.request(app)
-                            .get('/hidden')
-                            .auth('joe', 'password1')
-                            .catch(function(err){
-                                var res = err.response;
-                                res.should.have.status(401);
-                        });
+                .post('/users')
+                .send(user)
+                .then(function(res){
+                    return chai.request(app)
+                    .get('/hidden')
+                    .auth('joe', 'password1')
+                    .catch(function(err){
+                        var res = err.response;
+                        res.should.have.status(401);
                     });
+                });
             });
         });
 
         describe.only('PUT', function() {
             it('should allow editing a user', function() {
 
-                        var newUser = new User({
-                        username: 'joe',
-                        password: 'password'
-                    });
-
-                    var oldUser = new User({
-                        username: 'joe2',
-                        password: 'password2'
-                    });
-
-                    user.save().then(function(user) {
-                        console.log(user.password);
-                        res.location('/users/' + user._id).status(201).json({});
-                    });
-                var params;
-                return chai.request(app)
-                    .post('/users')
-                    .send(oldUser)
-                    .then(function(res) {
-                        params = this.pattern.match(res.headers.location);
-                        return chai.request(app)
-                            .put(this.pattern.stringify({
-                                userId: params.userId
-                            }))
-                            .send(newUser);
-                    }.bind(this))
-                    .then(function(res) {
-                        res.should.have.status(200);
-                        res.type.should.equal('application/json');
-                        res.charset.should.equal('utf-8');
-                        res.body.should.be.an('object');
-                        res.body.should.be.empty;
-
-                        return chai.request(app)
-                            .get(this.pattern.stringify({
-                                userId: params.userId
-                            }));
-                    }.bind(this))
-                    .then(function(res) {
-                        res.body.should.be.an('object');
-                        res.body.should.have.property('username');
-                        res.body.username.should.be.a('string');
-                        res.body.username.should.equal(newUser.username);
-                        res.body.should.have.property('_id');
-                        res.body._id.should.be.a('string');
-                        res.body._id.should.equal(params.userId);
-                    });
-            });
-            // it('should create a user if they don\'t exist', function() {
-            //     var user = {
-            //         _id: '000000000000000000000000',
-            //         username: 'joe'
-            //     };
-            //     return chai.request(app)
-            //         .put(this.pattern.stringify({
-            //             userId: user._id
-            //         }))
-            //         .send(user)
-            //         .then(function(res) {
-            //             res.should.have.status(200);
-            //             res.type.should.equal('application/json');
-            //             res.charset.should.equal('utf-8');
-            //             res.body.should.be.an('object');
-            //             res.body.should.be.empty;
-            //
-            //             return chai.request(app)
-            //                 .get(this.pattern.stringify({
-            //                     userId: user._id
-            //                 }));
-            //         }.bind(this))
-            //         .then(function(res) {
-            //             res.body.should.be.an('object');
-            //             res.body.should.have.property('username');
-            //             res.body.username.should.be.a('string');
-            //             res.body.username.should.equal(user.username);
-            //             res.body.should.have.property('_id');
-            //             res.body._id.should.be.a('string');
-            //             res.body._id.should.equal(user._id);
-            //         });
-            // });
-            it('should reject users without a username', function() {
-                var user = {
-                    _id: '000000000000000000000000'
-                };
-                var spy = chai.spy();
-                return chai.request(app)
-                    .put(this.pattern.stringify({
-                        userId: user._id
-                    }))
-                    .send(user)
-                    .then(spy)
-                    .then(function() {
-                        spy.should.not.have.been.called();
-                    })
-                    .catch(function(err) {
-                        var res = err.response;
-                        res.should.have.status(422);
-                        res.type.should.equal('application/json');
-                        res.charset.should.equal('utf-8');
-                        res.body.should.be.an('object');
-                        res.body.should.have.property('message');
-                        res.body.message.should.equal('Missing field: username');
-                    });
-            });
-            it('should reject non-string usernames', function() {
-                var user = {
-                    _id: '000000000000000000000000',
-                    username: 42,
-                    password: 'password'
-                };
-                var spy = chai.spy();
-                return chai.request(app)
-                    .put(this.pattern.stringify({
-                        userId: user._id
-                    }))
-                    .send(user)
-                    .then(spy)
-                    .then(function() {
-                        spy.should.not.have.been.called();
-                    })
-                    .catch(function(err) {
-                        var res = err.response;
-                        res.should.have.status(422);
-                        res.type.should.equal('application/json');
-                        res.charset.should.equal('utf-8');
-                        res.body.should.be.an('object');
-                        res.body.should.have.property('message');
-                        res.body.message.should.equal('Incorrect field type: username');
-                    });
-            });
-        });
-
-        describe('DELETE', function() {
-            it('should 404 on non-existent users', function() {
-                var spy = chai.spy();
-                return chai.request(app)
-                    .delete(this.pattern.stringify({userId: '000000000000000000000000'}))
-                    .then(spy)
-                    .then(function() {
-                        spy.should.not.have.been.called();
-                    })
-                    .catch(function(err) {
-                        var res = err.response;
-                        res.should.have.status(404);
-                        res.type.should.equal('application/json');
-                        res.charset.should.equal('utf-8');
-                        res.body.should.be.an('object');
-                        res.body.should.have.property('message');
-                        res.body.message.should.equal('User not found');
-                    });
-            });
-            it('should delete a user', function() {
-                var user = {
+                var newUser = new User({
                     username: 'joe',
                     password: 'password'
-                };
-                var params;
-                return chai.request(app)
-                    .post('/users')
-                    .send(user)
-                    .then(function(res) {
-                        params = this.pattern.match(res.headers.location);
-                        return chai.request(app)
-                            .delete(this.pattern.stringify({
-                                userId: params.userId
-                            }));
-                    }.bind(this))
-                    .then(function(res) {
-                        res.should.have.status(200);
-                        res.type.should.equal('application/json');
-                        res.charset.should.equal('utf-8');
-                        res.body.should.be.an('object');
-                        res.body.should.be.empty;
-                        var spy = chai.spy();
-                        return chai.request(app)
-                            .get(this.pattern.stringify({
-                                userId: params.userId
-                            }))
-                            .then(spy)
-                            .then(function() {
-                                spy.should.not.have.been.called();
-                            })
-                            .catch(function(err) {
-                                var res = err.response;
-                                res.should.have.status(404);
-                            });
-                    }.bind(this));
+                });
+
+                var oldUser = new User({
+                    username: 'joe2',
+                    password: 'password2'
+                });
+
+                newUser.save().then(chai.request(app)).then(function(res) {
+                    res.should.have.status(200);
+                    res.type.should.equal('application/json');
+                    res.charset.should.equal('utf-8');
+                    res.body.should.be.an('object');
+                    res.body.should.be.empty;
+
+
+                });
             });
+
+        });
+    });
+
+
+
+
+
+    describe('DELETE', function() {
+        it('should 404 on non-existent users', function() {
+            var spy = chai.spy();
+            return chai.request(app)
+            .delete(this.pattern.stringify({userId: '000000000000000000000000'}))
+            .then(spy)
+            .then(function() {
+                spy.should.not.have.been.called();
+            })
+            .catch(function(err) {
+                var res = err.response;
+                res.should.have.status(404);
+                res.type.should.equal('application/json');
+                res.charset.should.equal('utf-8');
+                res.body.should.be.an('object');
+                res.body.should.have.property('message');
+                res.body.message.should.equal('User not found');
+            });
+        });
+        it('should delete a user', function() {
+            var user = {
+                username: 'joe',
+                password: 'password'
+            };
+            var params;
+            return chai.request(app)
+            .post('/users')
+            .send(user)
+            .then(function(res) {
+                params = this.pattern.match(res.headers.location);
+                return chai.request(app)
+                .delete(this.pattern.stringify({
+                    userId: params.userId
+                }));
+            }.bind(this))
+            .then(function(res) {
+                res.should.have.status(200);
+                res.type.should.equal('application/json');
+                res.charset.should.equal('utf-8');
+                res.body.should.be.an('object');
+                res.body.should.be.empty;
+                var spy = chai.spy();
+                return chai.request(app)
+                .get(this.pattern.stringify({
+                    userId: params.userId
+                }))
+                .then(spy)
+                .then(function() {
+                    spy.should.not.have.been.called();
+                })
+                .catch(function(err) {
+                    var res = err.response;
+                    res.should.have.status(404);
+                });
+            }.bind(this));
         });
     });
 });
