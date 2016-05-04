@@ -220,7 +220,7 @@ describe('User endpoints', function() {
                         res.body._id.should.equal(params.userId);
                     });
             });
-            it('should protect user-only pages', function(){
+            it('should allow authenticated users to see hidden pages', function(){
                 var user = {
                     username: 'joe',
                     password: 'password'
@@ -230,10 +230,45 @@ describe('User endpoints', function() {
                     .send(user)
                     .then(function(res){
                         return chai.request(app)
-                        .get('/hidden')
-                        .auth(user.username, user.password)
-                        .then(function(res){
-                            res.should.have.status(200);
+                            .get('/hidden')
+                            .auth(user.username, user.password)
+                            .then(function(res){
+                                res.should.have.status(200);
+                        });
+                    });
+            });
+            it('should keep unauthenticated users out of hidden pages', function(){
+                var user = {
+                    username: 'joe',
+                    password: 'password'
+                };
+                return chai.request(app)
+                    .post('/users')
+                    .send(user)
+                    .then(function(res){
+                        return chai.request(app)
+                            .get('/hidden')
+                            .catch(function(err){
+                                var res = err.response;
+                                res.should.have.status(401);
+                        });
+                    });
+            });
+            it('should keep improperly authenticated users out of hidden pages', function(){
+                var user = {
+                    username: 'joe',
+                    password: 'password'
+                };
+                return chai.request(app)
+                    .post('/users')
+                    .send(user)
+                    .then(function(res){
+                        return chai.request(app)
+                            .get('/hidden')
+                            .auth('joe', 'password1')
+                            .catch(function(err){
+                                var res = err.response;
+                                res.should.have.status(401);
                         });
                     });
             });
