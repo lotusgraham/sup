@@ -277,33 +277,32 @@ describe('User endpoints', function() {
                 });
             });
         });
+        describe.only('PUT', function() {
+            it('should allow editing a user', function() {
 
-            // it('should allow editing a user', function() {
-            //
-            //     var user = new User({
-            //         username: 'joe',
-            //         password: 'password'
-            //     });
-            //     var newUserName = 'Aric';
-            //
-            //     return user.save(function(err){
-            //         if (err) {
-            //             console.log('error');
-            //         }
-            //         return chai.request(app)
-            //         .put('/users/' +user._id).send(newUserName)
-            //        .then(function(res) {
-            //            console.log('old: ',user);
-            //         //    res.should.have.status(200);
-            //         //    res.type.should.equal('application/json');
-            //         //    res.charset.should.equal('utf-8');
-            //         //    res.body.should.be.an('string');
-            //         //    res.body.should.be.empty
-            //         //    //: use Mongoose to test that the username has been changed correctly
-            //        });
-            //     });
-            // });
-            describe.only('PUT', function() {
+                var user = new User({
+                    username: 'joe',
+                    password: 'password'
+                });
+                var newUserName = 'Aric';
+
+                return user.save(function(err){
+                    if (err) {
+                        console.log('error');
+                    }
+                    return chai.request(app)
+                    .put('/users/' +user._id).send(newUserName)
+                   .then(function(res) {
+                       console.log('old: ',user);
+                       res.should.have.status(200);
+                       res.type.should.equal('application/json');
+                       res.charset.should.equal('utf-8');
+                       res.body.should.be.an('string');
+                       res.body.should.be.empty
+                       //TODO: use Mongoose to test that the username has been changed correctly
+                   });
+                });
+            });
             it('should reject users without a username', function() {
                 var user = {
                     _id: '000000000000000000000000'
