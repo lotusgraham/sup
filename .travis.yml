@@ -5,15 +5,13 @@ services:
 addons:
   apt:
     sources:
-    - mongodb-3.2-precise
+    - ubuntu-toolchain-r-test
     packages:
-    - mongodb-org-server
+    - g++-4.8
 env:
-  - CXX=g++-4.8
-
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-4.8
+- CXX=g++-4.8
+deploy:
+  provider: heroku
+  app: sup-app-coolguys
+  api_key:
+    secure: gZmobXYP5wDwyr9Lhrn9CpCJCbC34MzobgHFkG44JOadRjjAcFfEEtDGyTs/yiV3iwhps/jWgNt+nYh4XpfOQh0Vz4DVEO7LnNUvR+gTztkJYR7Mbv7aLCI2TMWEPh5LAlSJqwXpT/vhVvH1OS8ocI65wzUR4Z8bnuEXLEj7DHift+6hCqx9ivr2FA/e+/bs99anon/dXP8re1rBeMBCEy3oEfvVQpWHQ16MRFbUWimJNeylj+Islik2omvtlQQuM/hYdXk5ZfvnMKEPv4NJ7eB37EHhkh0ARQguJdPKvok41/QIC4kW3jUoSuk2H9QJLTLRKHiAOdxo9og/UsdfHJd4JH/201bR7iGxkHRpMvcNpIfLycopp0nu3RRPWK2Y6LrfscdjzY/yW+vQZpXLEhl55XixtTFGPrfWq5mt4kHeCX4wUgm1XQmWOBbc9Jlz1Kc5+mpZs1pqyOtIbh9fzx3vxn9fQyOa7UXIEMVqFD2CwfD42aLeoesIpgBbckZUt1r/4y2vVqNMKC9dLHPVCq3Vblequ1jFd8JIdxoEb2RLmnWhsYCeLQ4xBsmkr41ji0I8Oav0FoE/TsS7KcT7fsbLVhw/3ynRw+3XNzFFFaboqT5QNkGLaRHvL1h63oETPEhDOTsQN/paoJh/n2Yh58eaql7mLQdEcz/zHo0FcB8=
