@@ -290,11 +290,35 @@ app.get('/messages/:messageId', function(req, res) {
     });
 });
 
-var databaseUri = global.databaseUri || 'mongodb://localhost/sup';
-mongoose.connect(databaseUri).then(function() {
-    app.listen(8080, function() {
-        console.log('Listening on localhost:8080');
+var runServer = function(callback) {
+    var databaseUri = process.env.DATABASE_URI || global.databaseUri || 'mongodb://localhost/sup';
+    mongoose.connect(databaseUri).then(function() {
+        var port = process.env.PORT || 8080;
+        var server = app.listen(port, function() {
+            console.log('Listening on localhost:' + port);
+            if (callback) {
+                callback(server);
+            }
+        });
     });
-});
+};
 
-module.exports = app;
+if (require.main === module) {
+    runServer();
+}
+
+exports.app = app;
+exports.runServer = runServer;
+
+
+
+
+
+//var databaseUri = global.databaseUri || 'mongodb://localhost/sup';
+//mongoose.connect(databaseUri).then(function() {
+//    app.listen(8080, function() {
+//        console.log('Listening on localhost:8080');
+//    });
+//});
+//
+//module.exports = app;

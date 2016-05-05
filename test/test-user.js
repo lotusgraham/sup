@@ -6,7 +6,7 @@ var spies = require('chai-spies');
 var mongoose = require('mongoose');
 var UrlPattern = require('url-pattern');
 var shared = require('./shared');
-var app = require('../index');
+var app = require('../index').app;
 var bcrypt = require('bcrypt');
 var mongoose = require('mongoose');
 var User = require('../models/user');
@@ -20,8 +20,8 @@ chai.use(spies);
 // chai.use(bcrypt);
 
 describe('User endpoints', function() {
-    beforeEach(function() {
-        mongoose.connection.db.dropDatabase();
+    beforeEach(function(done) {
+        mongoose.connection.db.dropDatabase(done);
     });
     describe('/users', function() {
         beforeEach(function() {
