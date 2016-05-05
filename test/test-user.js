@@ -420,4 +420,3 @@ describe('User endpoints', function() {
     });
 });
 });
-//comments
