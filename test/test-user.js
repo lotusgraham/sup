@@ -10,7 +10,7 @@ var app = require('../index');
 var bcrypt = require('bcrypt');
 var mongoose = require('mongoose');
 var User = require('../models/user');
-var passport = require ('passport');
+var passport = require('passport');
 var BasicStrategy = require('passport-http').BasicStrategy;
 
 var should = chai.should();
@@ -20,19 +20,19 @@ chai.use(spies);
 // chai.use(bcrypt);
 
 describe('User endpoints', function() {
-    beforeEach(function () {
+    beforeEach(function() {
         mongoose.connection.db.dropDatabase();
     });
-    describe('/users', function () {
-        beforeEach(function () {
+    describe('/users', function() {
+        beforeEach(function() {
             this.pattern = new UrlPattern('/users');
         });
 
-        describe('GET', function () {
-            it('should return an empty list of users initially', function () {
+        describe('GET', function() {
+            it('should return an empty list of users initially', function() {
                 return chai.request(app)
                     .get(this.pattern.stringify())
-                    .then(function (res) {
+                    .then(function(res) {
                         res.should.have.status(200);
                         res.type.should.equal('application/json');
                         res.charset.should.equal('utf-8');
@@ -41,7 +41,7 @@ describe('User endpoints', function() {
                     });
             });
 
-            it('should return a list of users', function () {
+            it('should return a list of users', function() {
                 var user = {
                     username: 'joe',
                     password: 'password'
@@ -49,11 +49,11 @@ describe('User endpoints', function() {
                 return chai.request(app)
                     .post(this.pattern.stringify())
                     .send(user)
-                    .then(function (res) {
+                    .then(function(res) {
                         return chai.request(app)
                             .get(this.pattern.stringify());
                     }.bind(this))
-                    .then(function (res) {
+                    .then(function(res) {
                         res.should.have.status(200);
                         res.type.should.equal('application/json');
                         res.charset.should.equal('utf-8');
@@ -69,8 +69,8 @@ describe('User endpoints', function() {
 
             });
         });
-        describe('POST', function () {
-            it('should allow adding a user', function () {
+        describe('POST', function() {
+            it('should allow adding a user', function() {
                 var user = {
                     username: 'joe',
                     password: 'password'
@@ -78,7 +78,7 @@ describe('User endpoints', function() {
                 return chai.request(app)
                     .post(this.pattern.stringify())
                     .send(user)
-                    .then(function (res) {
+                    .then(function(res) {
                         res.should.have.status(201);
                         res.type.should.equal('application/json');
                         res.charset.should.equal('utf-8');
@@ -89,7 +89,7 @@ describe('User endpoints', function() {
                         return chai.request(app)
                             .get(res.headers.location);
                     })
-                    .then(function (res) {
+                    .then(function(res) {
                         res.body.should.be.an('object');
                         res.body.should.have.property('username');
                         res.body.username.should.be.a('string');
@@ -98,17 +98,17 @@ describe('User endpoints', function() {
                         res.body._id.should.be.a('string');
                     });
             });
-            it('should reject users without a username', function () {
+            it('should reject users without a username', function() {
                 var user = {};
                 var spy = chai.spy();
                 return chai.request(app)
                     .post(this.pattern.stringify())
                     .send(user)
                     .then(spy)
-                    .then(function () {
+                    .then(function() {
                         spy.should.not.have.been.called();
                     })
-                    .catch(function (err) {
+                    .catch(function(err) {
                         var res = err.response;
                         res.should.have.status(422);
                         res.type.should.equal('application/json');
@@ -118,7 +118,7 @@ describe('User endpoints', function() {
                         res.body.message.should.equal('Missing field: username');
                     });
             });
-            it('should reject non-string usernames', function () {
+            it('should reject non-string usernames', function() {
                 var user = {
                     username: 42,
                     password: 'password'
@@ -128,10 +128,10 @@ describe('User endpoints', function() {
                     .post(this.pattern.stringify())
                     .send(user)
                     .then(spy)
-                    .then(function () {
+                    .then(function() {
                         spy.should.not.have.been.called();
                     })
-                    .catch(function (err) {
+                    .catch(function(err) {
                         var res = err.response;
                         res.should.have.status(422);
                         res.type.should.equal('application/json');
@@ -141,7 +141,7 @@ describe('User endpoints', function() {
                         res.body.message.should.equal('Incorrect field type: username');
                     });
             });
-            it('should hash a password', function () {
+            it('should hash a password', function() {
                 var user = {
                     username: 'joe',
                     password: 'password'
@@ -149,7 +149,7 @@ describe('User endpoints', function() {
                 return chai.request(app)
                     .post(this.pattern.stringify())
                     .send(user)
-                    .then(function (res) {
+                    .then(function(res) {
                         res.should.have.status(201);
                         res.type.should.equal('application/json');
                         res.charset.should.equal('utf-8');
@@ -160,7 +160,7 @@ describe('User endpoints', function() {
                         return chai.request(app)
                             .get(res.headers.location);
                     })
-                    .then(function (res) {
+                    .then(function(res) {
                         res.body.should.be.an('object');
                         res.body.should.have.property('password');
                         res.body.password.should.be.a('string');
@@ -170,21 +170,23 @@ describe('User endpoints', function() {
         });
     });
 
-    describe('/users/:userId', function () {
-        beforeEach(function () {
+    describe('/users/:userId', function() {
+        beforeEach(function() {
             this.pattern = new UrlPattern('/users/:userId');
         });
 
-        describe('GET', function () {
-            it('should 404 on non-existent users', function () {
+        describe('GET', function() {
+            it('should 404 on non-existent users', function() {
                 var spy = chai.spy();
                 return chai.request(app)
-                    .get(this.pattern.stringify({userId: '000000000000000000000000'}))
+                    .get(this.pattern.stringify({
+                        userId: '000000000000000000000000'
+                    }))
                     .then(spy)
-                    .then(function () {
+                    .then(function() {
                         spy.should.not.have.been.called();
                     })
-                    .catch(function (err) {
+                    .catch(function(err) {
                         var res = err.response;
                         res.should.have.status(404);
                         res.type.should.equal('application/json');
@@ -195,7 +197,7 @@ describe('User endpoints', function() {
                     });
             });
 
-            it('should return a single user', function () {
+            it('should return a single user', function() {
                 var user = {
                     username: 'joe',
                     password: 'password'
@@ -204,14 +206,14 @@ describe('User endpoints', function() {
                 return chai.request(app)
                     .post('/users')
                     .send(user)
-                    .then(function (res) {
+                    .then(function(res) {
                         params = this.pattern.match(res.headers.location);
                         return chai.request(app)
                             .get(this.pattern.stringify({
                                 userId: params.userId
                             }));
                     }.bind(this))
-                    .then(function (res) {
+                    .then(function(res) {
                         res.should.have.status(200);
                         res.type.should.equal('application/json');
                         res.charset.should.equal('utf-8');
@@ -224,7 +226,7 @@ describe('User endpoints', function() {
                         res.body._id.should.equal(params.userId);
                     });
             });
-            it('should allow authenticated users to see hidden pages', function () {
+            it('should allow authenticated users to see hidden pages', function() {
                 var user = {
                     username: 'joe',
                     password: 'password'
@@ -232,16 +234,16 @@ describe('User endpoints', function() {
                 return chai.request(app)
                     .post('/users')
                     .send(user)
-                    .then(function (res) {
+                    .then(function(res) {
                         return chai.request(app)
                             .get('/hidden')
                             .auth(user.username, user.password)
-                            .then(function (res) {
+                            .then(function(res) {
                                 res.should.have.status(200);
                             });
                     });
             });
-            it('should keep unauthenticated users out of hidden pages', function () {
+            it('should keep unauthenticated users out of hidden pages', function() {
                 var user = {
                     username: 'joe',
                     password: 'password'
@@ -249,16 +251,16 @@ describe('User endpoints', function() {
                 return chai.request(app)
                     .post('/users')
                     .send(user)
-                    .then(function (res) {
+                    .then(function(res) {
                         return chai.request(app)
                             .get('/hidden')
-                            .catch(function (err) {
+                            .catch(function(err) {
                                 var res = err.response;
                                 res.should.have.status(401);
                             });
                     });
             });
-            it('should keep improperly authenticated users out of hidden pages', function () {
+            it('should keep improperly authenticated users out of hidden pages', function() {
                 var user = {
                     username: 'joe',
                     password: 'password'
@@ -266,11 +268,11 @@ describe('User endpoints', function() {
                 return chai.request(app)
                     .post('/users')
                     .send(user)
-                    .then(function (res) {
+                    .then(function(res) {
                         return chai.request(app)
                             .get('/hidden')
                             .auth('joe', 'password1')
-                            .catch(function (err) {
+                            .catch(function(err) {
                                 var res = err.response;
                                 res.should.have.status(401);
                             });
@@ -278,8 +280,8 @@ describe('User endpoints', function() {
             });
         });
 
-        describe('PUT', function () {
-            it('should allow editing a user', function () {
+        describe('PUT', function() {
+            it('should allow editing a user', function() {
 
                 var user = new User({
                     username: 'joe',
@@ -287,13 +289,13 @@ describe('User endpoints', function() {
                 });
                 var newUserName = 'Aric';
 
-                return user.save(function (err) {
+                return user.save(function(err) {
                     if (err) {
                         console.log('error');
                     }
                     return chai.request(app)
                         .put('/users/' + user._id).send(newUserName)
-                        .then(function (res) {
+                        .then(function(res) {
                             console.log('old: ', user);
                             res.should.have.status(200);
                             res.type.should.equal('application/json');
@@ -304,7 +306,7 @@ describe('User endpoints', function() {
                         });
                 });
             });
-            it('should reject users without a username', function () {
+            it('should reject users without a username', function() {
                 var user = {
                     _id: '000000000000000000000000'
                 };
@@ -315,10 +317,10 @@ describe('User endpoints', function() {
                     }))
                     .send(user)
                     .then(spy)
-                    .then(function () {
+                    .then(function() {
                         spy.should.not.have.been.called();
                     })
-                    .catch(function (err) {
+                    .catch(function(err) {
                         var res = err.response;
                         res.should.have.status(422);
                         res.type.should.equal('application/json');
@@ -328,7 +330,7 @@ describe('User endpoints', function() {
                         res.body.message.should.equal('Missing field: username');
                     });
             });
-            it('should reject non-string usernames', function () {
+            it('should reject non-string usernames', function() {
                 var user = {
                     _id: '000000000000000000000000',
                     username: 42,
@@ -341,10 +343,10 @@ describe('User endpoints', function() {
                     }))
                     .send(user)
                     .then(spy)
-                    .then(function () {
+                    .then(function() {
                         spy.should.not.have.been.called();
                     })
-                    .catch(function (err) {
+                    .catch(function(err) {
                         var res = err.response;
                         res.should.have.status(422);
                         res.type.should.equal('application/json');
@@ -356,69 +358,65 @@ describe('User endpoints', function() {
             });
 
         });
+
+    describe('DELETE', function() {
+        it('should 404 on non-existent users', function() {
+            var spy = chai.spy();
+            return chai.request(app)
+                .delete(this.pattern.stringify({
+                    userId: '000000000000000000000000'
+                }))
+                .then(spy)
+                .then(function() {
+                    spy.should.not.have.been.called();
+                })
+                .catch(function(err) {
+                    var res = err.response;
+                    res.should.have.status(404);
+                    res.type.should.equal('application/json');
+                    res.charset.should.equal('utf-8');
+                    res.body.should.be.an('object');
+                    res.body.should.have.property('message');
+                    res.body.message.should.equal('User not found');
+                });
+        });
+        it('should delete a user', function() {
+            var user = {
+                username: 'joe',
+                password: 'password'
+            };
+            var params;
+            return chai.request(app)
+                .post('/users')
+                .send(user)
+                .then(function(res) {
+                    params = this.pattern.match(res.headers.location);
+                    return chai.request(app)
+                        .delete(this.pattern.stringify({
+                            userId: params.userId
+                        }));
+                }.bind(this))
+                .then(function(res) {
+                    res.should.have.status(200);
+                    res.type.should.equal('application/json');
+                    res.charset.should.equal('utf-8');
+                    res.body.should.be.an('object');
+                    res.body.should.be.empty;
+                    var spy = chai.spy();
+                    return chai.request(app)
+                        .get(this.pattern.stringify({
+                            userId: params.userId
+                        }))
+                        .then(spy)
+                        .then(function() {
+                            spy.should.not.have.been.called();
+                        })
+                        .catch(function(err) {
+                            var res = err.response;
+                            res.should.have.status(404);
+                        });
+                }.bind(this));
+        });
     });
-
 });
-
-
-
-
-
-//    describe('DELETE', function() {
-//        it('should 404 on non-existent users', function() {
-//            var spy = chai.spy();
-//            return chai.request(app)
-//                .delete(this.pattern.stringify({userId: '000000000000000000000000'}))
-//                .then(spy)
-//                .then(function() {
-//                    spy.should.not.have.been.called();
-//                })
-//                .catch(function(err) {
-//                    var res = err.response;
-//                    res.should.have.status(404);
-//                    res.type.should.equal('application/json');
-//                    res.charset.should.equal('utf-8');
-//                    res.body.should.be.an('object');
-//                    res.body.should.have.property('message');
-//                    res.body.message.should.equal('User not found');
-//                });
-//        });
-//        it('should delete a user', function() {
-//            var user = {
-//                username: 'joe',
-//                password: 'password'
-//            };
-//            var params;
-//            return chai.request(app)
-//                .post('/users')
-//                .send(user)
-//                .then(function(res) {
-//                    params = this.pattern.match(res.headers.location);
-//                    return chai.request(app)
-//                        .delete(this.pattern.stringify({
-//                            userId: params.userId
-//                        }));
-//                }.bind(this))
-//                .then(function(res) {
-//                    res.should.have.status(200);
-//                    res.type.should.equal('application/json');
-//                    res.charset.should.equal('utf-8');
-//                    res.body.should.be.an('object');
-//                    res.body.should.be.empty;
-//                    var spy = chai.spy();
-//                    return chai.request(app)
-//                        .get(this.pattern.stringify({
-//                            userId: params.userId
-//                        }))
-//                        .then(spy)
-//                        .then(function() {
-//                            spy.should.not.have.been.called();
-//                        })
-//                        .catch(function(err) {
-//                            var res = err.response;
-//                            res.should.have.status(404);
-//                        });
-//                }.bind(this));
-//        });
-//    });
-//});
+});
