@@ -6,7 +6,7 @@ var spies = require('chai-spies');
 var mongoose = require('mongoose');
 var UrlPattern = require('url-pattern');
 var shared = require('./shared');
-var app = require('../index');
+var app = require('../index').app;
 
 var should = chai.should();
 
@@ -14,34 +14,38 @@ chai.use(chaiHttp);
 chai.use(spies);
 
 describe('Message endpoints', function() {
-    beforeEach(function() {
-        mongoose.connection.db.dropDatabase();
-        this.alice = {
-            username: 'alice',
-            _id: 'AAAAAAAAAAAAAAAAAAAAAAAA'
-        };
+    var server;
+    beforeEach(function(done) {
+        mongoose.connection.db.dropDatabase(function(err, res) {
+            this.alice = {
+                username: 'alice',
+                _id: 'AAAAAAAAAAAAAAAAAAAAAAAA'
+            };
 
-        this.bob = {
-            username: 'bob',
-            _id: 'BBBBBBBBBBBBBBBBBBBBBBBB'
-        };
+            this.bob = {
+                username: 'bob',
+                _id: 'BBBBBBBBBBBBBBBBBBBBBBBB'
+            };
 
-        this.chuck = {
-            username: 'chuck',
-            _id: 'CCCCCCCCCCCCCCCCCCCCCCCC'
-        };
+            this.chuck = {
+                username: 'chuck',
+                _id: 'CCCCCCCCCCCCCCCCCCCCCCCC'
+            };
 
-        // Create users
-        var promiseA = chai.request(app)
+            // Create users
+            var promiseA = chai.request(app)
                 .put('/users/' + this.alice._id)
                 .send(this.alice);
-        var promiseB = chai.request(app)
+            var promiseB = chai.request(app)
                 .put('/users/' + this.bob._id)
                 .send(this.bob);
-        var promiseC = chai.request(app)
+            var promiseC = chai.request(app)
                 .put('/users/' + this.chuck._id)
                 .send(this.chuck);
-        return Promise.all([promiseA, promiseB, promiseC]);
+            Promise.all([promiseA, promiseB, promiseC]).then(function() {
+                done();
+            });
+        }.bind(this));
     });
 
     describe('/messages', function() {
