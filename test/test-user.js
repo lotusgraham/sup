@@ -24,8 +24,9 @@ describe('User endpoints', function() {
         mongoose.connection.db.dropDatabase(done);
     });
     describe('/users', function() {
-        beforeEach(function() {
+        beforeEach(function(done) {
             this.pattern = new UrlPattern('/users');
+            done();
         });
 
         describe('GET', function() {
