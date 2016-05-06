@@ -49,8 +49,9 @@ describe('Message endpoints', function() {
     });
 
     describe('/messages', function() {
-        beforeEach(function() {
+        beforeEach(function(done) {
             this.pattern = new UrlPattern('/messages');
+            done();
         });
 
         describe('GET', function() {
